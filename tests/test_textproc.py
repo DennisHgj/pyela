@@ -1,17 +1,15 @@
 import os
 import pandas as pd
-import numpy as np
 import sys
-from datetime import datetime
 from striplog import Lexicon
 
 pkg_dir = os.path.join(os.path.dirname(__file__),'..')
 
-sys.path.append(pkg_dir)
+sys.path.insert(0, pkg_dir)
 
 from ela.textproc import *
 
-# To avoit failing test on Travis:
+# To avoid failing test on Travis:
 
 try:
     nltk.data.find('tokenizers/punkt')
@@ -23,10 +21,10 @@ except LookupError:
 # except LookupError:
 #     nltk.download('averaged_perceptron_tagger')
 
-# try:
-#     nltk.data.find('tokenizers/stopwords')
-# except LookupError:
-#     nltk.download('stopwords')
+try:
+    nltk.data.find('tokenizers/stopwords')
+except LookupError:
+    nltk.download('stopwords')
 
 def test_litho_marker_detection():
     prim_classes = {
@@ -56,7 +54,7 @@ def test_v_word_tokenize():
     descriptions = ['yellow, slightly clayey sand','75% sand, 20% silt, 5% gravel']
     tkns = v_word_tokenize(descriptions)
     assert len(tkns) == 2
-    assert len(tkns[0]) == 5    
+    assert len(tkns[0]) == 5
     assert len(tkns[1]) == 11
 
 
@@ -102,4 +100,24 @@ def test_v_find_litho_markers():
     assert terms[0][1] == 'sand'
     assert terms[0][2] == 'silt'
     assert terms[1][0] == 'ironstone'
+
+def test_flatten_strings():
+    descs = [
+        'clay, sand',
+        'clay with loam  ;',
+        'uranium'
+    ]
+    tk = flat_list_tokens(descs)
+    assert set(tk) == set(['clay', 'loam', 'uranium', 'sand'])
+
+
+def test_replace_punctuations():
+    textlist = ['Lots of basalt.driller joe 24/10/1982','clay/loam vfine silt. black-brown']
+    rpl = v_replace_punctuations(textlist)
+    assert rpl[0] == 'Lots of basalt driller joe 24 10 1982'
+    assert rpl[1] == 'clay loam vfine silt  black brown'
+    rpl = v_replace_punctuations(textlist, replacement='R')
+    assert rpl[0] == 'Lots of basaltRdriller joe 24R10R1982'
+
+
 

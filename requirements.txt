@@ -1,3 +1,5 @@
+PVGeo
+pyvista
 # 2018-10 bumping requirements up to what I can see from `conda list`; otherwise old numpy on travis causes issues
 # It may be possible to lower version requireents but I do not have time to chase that rabbit up down the python version holes.
 cython>=0.28.5
@@ -8,6 +10,7 @@ scikit-learn>=0.19.1
 matplotlib>=2.2.2
 geopandas>=0.3.0
 Cartopy>=0.16.0
+wordcloud>=1.5.0
 # ipykernel>=4.8.2
 # ipywidgets>=7.2.1
 # jupyterlab>=0.32.1
