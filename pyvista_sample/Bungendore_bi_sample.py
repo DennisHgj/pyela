@@ -1,12 +1,13 @@
-import time
-import pyvista as pv
 import os
 import sys
-import numpy as np
-from matplotlib.colors import ListedColormap
-from ela.visual import discrete_classes_colormap
+
+import pyvista as pv
+
 from pyvista_sample.VisualizeDataProcess import VisualizeDataProcess
 
+'''
+Binary sample of 3D visualize based on pyvista
+'''
 pkg_dir = os.path.join(os.path.dirname(__file__), '..')
 sys.path.insert(0, pkg_dir)
 
@@ -24,7 +25,7 @@ else:
 drill_data_path = os.path.join(data_path, 'Bungendore', 'classified_logs.pkl')
 bungendore_datadir = os.path.join(data_path, 'Bungendore')
 dem_data_path = os.path.join(bungendore_datadir, 'dem_array_data.pkl')
-
+"""Data process"""
 dp = VisualizeDataProcess()
 drill_data = dp.drill_file_read(drill_data_path)
 dem_data = dp.dem_file_read(dem_data_path)
@@ -61,25 +62,28 @@ sargs = dict(
 
 plotter = pv.Plotter(shape=(1, 2))
 plotter.subplot(0, 0)
+borehole_data = pv.PolyData()
 for well in lines_dict.keys():
-    plotter.add_mesh(lines_dict.get(well),
-                     scalars=dp.scalar_prop_name,
-                     scalar_bar_args=sargs,
-                     annotations=annotations,
-                     show_edges=False,
-                     edge_color="white",
-                     n_colors=11,
-                     nan_color="black",
-                     clim=[0, 10],
-                     opacity=1,
-                     )
+    borehole_data.boolean_add(lines_dict.get(well), inplace=True)
+plotter.add_mesh(borehole_data,
+                 scalars=dp.scalar_prop_name,
+                 scalar_bar_args=sargs,
+                 annotations=annotations,
+                 show_edges=False,
+                 edge_color="white",
+                 n_colors=len(annotations),
+                 nan_color="black",
+                 clim=[0, len(annotations) - 1],
+                 opacity=1,
+                 )
 plotter.add_mesh(grid, opacity=0.9)
 plotter.show_bounds(grid, show_xaxis=True, show_yaxis=True, show_zaxis=False)
 plotter.show_axes()
 
 plotter.subplot(0, 1)
 
-plotter.add_mesh(layer, scalars="Lithology", n_colors=11, clim=[0, 10], scalar_bar_args=sargs, annotations=annotations)
+plotter.add_mesh(layer, scalars="Lithology", n_colors=len(annotations), clim=[0, len(annotations) - 1],
+                 scalar_bar_args=sargs, annotations=annotations)
 plotter.add_mesh(grid, opacity=0.9)
 plotter.show_bounds(grid, show_xaxis=True, show_yaxis=True, show_zaxis=False)
 plotter.show_axes()
